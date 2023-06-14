@@ -16,13 +16,13 @@ Parameters:
   PublicSubnet:
     Description: Public Subnet to Deploy Bastion Host in.
     Type: AWS::EC2::Subnet::Id
-#  PublicNetworkAcl:
-#    Description: Enter Public Network ACL ID.
-#    Type: String
-#    Default: acl-0000000
-#  InternalAccessSecurityGroup:
-#    Description: Security Group That Allows Bastion Host Access to Instances.
-#    Type: AWS::EC2::SecurityGroup::Id
+  #  PublicNetworkAcl:
+  #    Description: Enter Public Network ACL ID.
+  #    Type: String
+  #    Default: acl-0000000
+  #  InternalAccessSecurityGroup:
+  #    Description: Security Group That Allows Bastion Host Access to Instances.
+  #    Type: AWS::EC2::SecurityGroup::Id
   OsType:
     Description: Select OS Type for Bastion Host.
     Type: String
@@ -38,16 +38,16 @@ Parameters:
     Default: 0.0.0.0/0
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
     ConstraintDescription: must be a valid CIDR range of the form x.x.x.x/x.
-#  AllowSshRdpToBastionRuleNumber:
-#    Description: Enter Public Network ACL Rule Number to Allow SSH/RDP Access to EIP
-#      from Network Access IP.
-#    Type: Number
-#    Default: '200'
-#  AllowIcmpToBastionRuleNumber:
-#    Description: Enter Public Network ACL Rule Number to Allow SSH/RDP Access to EIP
-#      from Network Access IP.
-#    Type: Number
-#    Default: '205'
+  #  AllowSshRdpToBastionRuleNumber:
+  #    Description: Enter Public Network ACL Rule Number to Allow SSH/RDP Access to EIP
+  #      from Network Access IP.
+  #    Type: Number
+  #    Default: '200'
+  #  AllowIcmpToBastionRuleNumber:
+  #    Description: Enter Public Network ACL Rule Number to Allow SSH/RDP Access to EIP
+  #      from Network Access IP.
+  #    Type: Number
+  #    Default: '205'
   PackageList:
     Description: Enter Packages to install (Space Separated)
     Type: String
@@ -58,13 +58,19 @@ Parameters:
   InstanceType:
     Description: Select Instance Type.
     Type: String
-    Default: t4g.micro
+    Default: t3.micro
     AllowedValues:
-      - t4g.nano
-      - t4g.micro
-      - t4g.small
-      - t4g.medium
-      - t4g.large
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+    # x86 AMI 이미지는 t4g 그라비톤을 지원하지 않음
+    #      - t4g.nano
+    #      - t4g.micro
+    #      - t4g.small
+    #      - t4g.medium
+    #      - t4g.large
     ConstraintDescription: Must be a valid EC2 instance type.
 Mappings:
   RegionMap:
@@ -229,7 +235,7 @@ Resources:
       Monitoring: 'true'
       SecurityGroupIds:
         - Ref: BastionSecurityGroup
-#        - Ref: InternalAccessSecurityGroup
+      #        - Ref: InternalAccessSecurityGroup
       SubnetId:
         Ref: PublicSubnet
       UserData:
@@ -422,30 +428,30 @@ Metadata:
           - VPC
           - PublicSubnet
           - NetworkAccessIP
-#          - InternalAccessSecurityGroup
-#          - PublicNetworkAcl
-#      - Label:
-#          default: Network ACL Rule Numbers
-#        Parameters:
-#          - AllowSshRdpToBastionRuleNumber
-#          - AllowIcmpToBastionRuleNumber
+    #          - InternalAccessSecurityGroup
+    #          - PublicNetworkAcl
+    #      - Label:
+    #          default: Network ACL Rule Numbers
+    #        Parameters:
+    #          - AllowSshRdpToBastionRuleNumber
+    #          - AllowIcmpToBastionRuleNumber
     ParameterLabels:
       Owner:
         default: Team or Individual Owner
       PublicSubnet:
         default: Public Subnet
-#      PublicNetworkAcl:
-#        default: Public Network ACL
-#      InternalAccessSecurityGroup:
-#        default: Instance Access Security Group
+      #      PublicNetworkAcl:
+      #        default: Public Network ACL
+      #      InternalAccessSecurityGroup:
+      #        default: Instance Access Security Group
       NetworkAccessIP:
         default: Network IP to Access Bastion Host
       OsType:
         default: OS Type
-#      AllowSshRdpToBastionRuleNumber:
-#        default: Remote to Public SSH/RDP
-#      AllowIcmpToBastionRuleNumber:
-#        default: Remote to Public ICMP
+      #      AllowSshRdpToBastionRuleNumber:
+      #        default: Remote to Public SSH/RDP
+      #      AllowIcmpToBastionRuleNumber:
+      #        default: Remote to Public ICMP
       InstanceType:
         default: Instance Type
       PackageList:

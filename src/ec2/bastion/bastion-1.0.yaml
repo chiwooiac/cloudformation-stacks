@@ -69,7 +69,7 @@ Parameters:
 Mappings:
   RegionMap:
     ap-northeast-2:
-      AMIAmazon: ami-010d61e89c3af784f # amazon/amzn2-ami-hvm
+      AMIAmazon: ami-0b9e07b9baa424b6d # amazon/amzn2-ami-hvm
       AMIUbuntu: ami-d732f0b7
     us-west-2:
       AMIAmazon: ami-b04e92d0

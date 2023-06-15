@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Bastion Host by Levon Becker v20161012-2100
+Description: Bastion Host by Symplesims v20230615
 Parameters:
   Owner:
     Description: Enter Team or Individual Name Responsible for the Stack.
@@ -51,7 +51,7 @@ Parameters:
   PackageList:
     Description: Enter Packages to install (Space Separated)
     Type: String
-    Default: curl wget ca-certificates openssl vim git awscli yum-utils nfs-utils
+    Default: curl wget ca-certificates vim git awscli nfs-utils
   Ec2KeyPair:
     Description: Select Keypair to Assign to EC2 Instances
     Type: AWS::EC2::KeyPair::KeyName

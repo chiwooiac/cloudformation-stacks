@@ -3,26 +3,23 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: nova-provisioner by Symplesims@gmail.com v20230905
 Parameters:
   Owner:
-    Description: CloudFormation 스택을 운영할 Owner 의 이메일을 입력합니다.
-    Type: String
-  Project:
-    Description: 프로젝트 코드를 설정합니다.
+    Description: "Enter the email of the Owner who will operate the CloudFormation stack."
     Type: String
   VPC:
-    Description: VPC 를 선택 합니다.
+    Description: "Enter your VPC ID."
     Type: AWS::EC2::VPC::Id
   PublicSubnet:
-    Description: Public 서브넷 아이디를 정의 합니다.
+    Description: "Enter the Public subnet ID."
     Type: AWS::EC2::Subnet::Id
   OsType:
-    Description: "OS 타입을 입력합니다."
+    Description: "Enter the OS type."
     Type: String
     Default: amazon
     AllowedValues:
       - amazon
       - ubuntu
   InstanceType:
-    Description: "인스턴스 타입을 입력합니다. (예: t3.micro, t3.small, t3.medium, t3.large)"
+    Description: "Enter the instance type. (eg: t3.micro, t3.small, t3.medium, t3.large)"
     Type: String
     Default: t3.small
     AllowedValues:
@@ -30,33 +27,6 @@ Parameters:
       - t3.small
       - t3.medium
       - t3.large
-#  InstanceFamily:
-#    Description: "Instance Family (ie: t4g, t3a, t3)"
-#    Type: String
-#    AllowedValues:
-#      - t3
-#      - t3a
-#      - t4g
-#  InstanceSize:
-#    Description: "인스턴스 크기를 설정합니다. (ie: micro, small, medium, large)"
-#    Type: String
-#    AllowedValues:
-#      - micro
-#      - small
-#      - medium
-#      - large
-#  NetworkAccessIP:
-#    Description: KeyPair 를 통해 SSH 접속을 하려는 IP를 입력하세요. (예시. 50.32.108.38/32)
-#    Type: String
-#    MinLength: '9'
-#    MaxLength: '18'
-#    Default: 0.0.0.0/0
-#    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
-#  Ec2KeyPair:
-#    Description: Select Keypair to Assign to EC2 Instances
-#    Type: AWS::EC2::KeyPair::KeyName
-
----
 Mappings:
   AmiRegionMap:
     ap-northeast-2:
@@ -68,8 +38,6 @@ Mappings:
     us-east-1:
       amazon: ami-051f7e7f6c2f40dc1 # Amazon Linux 2023 AMI 2023.1.20230825.0 x86_64 HVM kernel-6.1
       ubuntu: ami-053b0d53c279acc90 # Ubuntu, 22.04 LTS, amd64 jammy image build on 2023-05-16
-
----
 Conditions:
   AmazonHost:
     Fn::Equals:
@@ -79,34 +47,16 @@ Conditions:
     Fn::Equals:
       - Ref: OsType
       - ubuntu
-#  LinuxHost:
-#    Fn::Or:
-#      - Fn::Equals:
-#          - Ref: OsType
-#          - amazon
-#      - Fn::Equals:
-#          - Ref: OsType
-#          - ubuntu
-#  RhelFamily:
-#    Fn::Or:
-#      - Fn::Equals:
-#          - Ref: OsType
-#          - amazon
-#      - Fn::Equals:
-#          - Ref: OsType
-#          - centos
-#      - Fn::Equals:
-#          - Ref: OsType
-#          - rhel
-#  WindowsHost:
-#    Fn::Equals:
-#      - Ref: OsType
-#      - windows
----
 Resources:
   IamRole:
     Type: AWS::IAM::Role
     Properties:
+      Path: "/"
+      RoleName:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::StackName
+            - "-provisioner-role"
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -124,32 +74,16 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonRDSFullAccess
         - arn:aws:iam::aws:policy/AmazonRoute53FullAccess
         - arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess
-        - arn:aws:iam::aws:policy/AWSCloudTrail_FullAccess
-        - arn:aws:iam::aws:policy/AWSCodeCommitFullAccess
-        - arn:aws:iam::aws:policy/AWSCodeDeployFullAccess
-        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
-        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
-        - arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
-        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
-        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
-        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
-        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
-        - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
-        - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
-        - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
-        - arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator
-  Path: "/"
   IamPolicies:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName:
         Fn::Join:
           - ''
-          - - Ref: Project
-            - "-provisioner"
-            - "-policy"
+          - - Ref: AWS::StackName
+            - "-provisioner-policy"
       PolicyDocument:
         Statement:
           - Effect: Deny
@@ -178,6 +112,11 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: SSH Access to Instance
+      GroupName:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::StackName
+            - "-provisioner-sg"
       VpcId:
         Ref: VPC
       Tags:
@@ -190,9 +129,9 @@ Resources:
         - Key: Owner
           Value:
             Ref: Owner
-        - Key: Project
+        - Key: Name
           Value:
-            Ref: Project
+            Ref: AWS::StackName
       SecurityGroupEgress:
         - IpProtocol: "-1"
           CidrIp: 0.0.0.0/0
@@ -212,6 +151,7 @@ Resources:
         - Ref: EC2SecurityGroup
       IamInstanceProfile:
         Ref: IamInstanceProfile
+
       ImageId:
         Fn::If:
           - AmazonHost
@@ -219,24 +159,16 @@ Resources:
               - AmiRegionMap
               - Ref: AWS::Region
               - amazon
-          - Fn::If:
-              - UbuntuHost
-              - Fn::FindInMap:
-                  - AmiRegionMap
-                  - Ref: AWS::Region
-                  - ubuntu
+          - Fn::FindInMap:
+              - AmiRegionMap
+              - Ref: AWS::Region
+              - ubuntu
+
       UserData:
-        - Fn::If:
-            - UbuntuHost
-            - Fn::Base64: !Sub |
-                #!/bin/bash -xe
-                /opt/aws/bin/cfn-init --stack ${AWS::StackName} --resource ElasticBootstrap --configsets ElasticInstallationSet --region ${AWS::Region}
-                /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource ElasticBootstrap --region ${AWS::Region}
-        - Fn::If:
-            - AmazonHost
-            - Fn::Base64: !Sub |
-                curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | bash
-                tfswitch --latest-stable 1.4.5
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          sudo yum install -y git jq
+
       Tags:
         - Key: Name
           Value:
@@ -244,13 +176,12 @@ Resources:
         - Key: Owner
           Value:
             Ref: Owner
-        - Key: Project
-          Value:
-            Ref: Project
+
   EIP:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
+
   EIPAssociation:
     Type: AWS::EC2::EIPAssociation
     DependsOn:
@@ -264,22 +195,11 @@ Resources:
           - EIP
           - AllocationId
 
----
 Outputs:
   Owner:
     Description: Team or Individual that Owns this Formation.
     Value:
       Ref: Owner
-  Project:
-    Description: The project name
-    Value:
-      Ref: Project
-  PublicDns:
-    Description: Bastion Public DNS Name
-    Value:
-      Fn::GetAtt:
-        - EC2Instance
-        - PublicDnsName
   EIP:
     Description: Bastion External IP Address
     Value:
@@ -318,7 +238,6 @@ Metadata:
       - Label:
           default: Instance Settings
         Parameters:
-          - Ec2KeyPair
           - OsType
           - InstanceType
       - Label:
@@ -328,10 +247,10 @@ Metadata:
           - PublicSubnet
     ParameterLabels:
       Owner:
-        default: "CloudFormation 스택을 관리하는 owner 이메일 주소를 입력하세요"
+        default: "Enter the owner email address that manages the CloudFormation stack"
       PublicSubnet:
-        default: "Public 서브넷 아이디를 입력하세요"
+        default: "Enter the public subnet ID"
       OsType:
-        default: "OS 유형을 입력하세요"
+        default: "Please enter your OS type"
       InstanceType:
-        default: "EC2 인스턴스 타입을 입력하세요."
+        default: "Enter the EC2 instance type."

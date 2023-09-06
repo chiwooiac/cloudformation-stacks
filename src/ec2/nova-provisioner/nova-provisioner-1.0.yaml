@@ -132,6 +132,13 @@ Resources:
             - "-policy"
       PolicyDocument:
         Statement:
+          - Effect: Allow
+            Action:
+              - ecs:*
+              - ecr:*
+              - kms:*
+              - ses:*
+              - sqs:*
           - Effect: Deny
             Action:
               - cloudhsm:*

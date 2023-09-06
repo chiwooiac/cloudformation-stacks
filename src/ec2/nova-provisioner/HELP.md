@@ -40,6 +40,9 @@ curl -O https://raw.githubusercontent.com/chiwooiac/cloudformation-stacks/main/s
 | VPC              | vpc-ee44df7      | 현재 가용할 수 있는 VPC ID를 선택할 수 있습니다.                |
 | Public subnet    | ssubnet-1e9b3d49 | 현재 가용할 수 있는 Public Subnet ID를 선택할 수 있습니다.      |
 
+
+<br>
+
 - 모든 설정 정보를 리뷰하고 `Submit` 버튼을 클릭하여 CF 스택을 생성 합니다. 
 
 ![img_3.png](..%2F..%2F..%2Fimg%2Fimg_3.png)

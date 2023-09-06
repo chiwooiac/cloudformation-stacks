@@ -256,6 +256,10 @@ Resources:
               unzip awscliv2.zip
               sudo ./aws/install
               ln -s /usr/local/bin/aws /usr/bin/aws
+              # kubectl
+              curl -o /tmp/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.4/2023-08-16/bin/linux/amd64/kubectl
+              chmod +x /tmp/kubectl
+              mv /tmp/kubectl /usr/local/bin/
               # docker
               sudo snap install docker
               sudo groupadd docker

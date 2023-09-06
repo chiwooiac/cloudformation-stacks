@@ -2,9 +2,26 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: nova-provisioner by Symplesims@gmail.com v20230905
 Parameters:
+  Name:
+    Description: "Resource Name of CloudFormation Stack"
+    Type: String
+    Default: provisioner
   Owner:
     Description: "Enter the email of the Owner who will operate the CloudFormation stack."
     Type: String
+  Team:
+    Description: "Team name that will operate the CloudFormation stack."
+    Type: String
+    Default: DevOps
+  Environment:
+    Description: "Runtime Environment Stack such as Production | Development | Testbed."
+    Type: String
+    Default: Development
+    AllowedValues:
+      - Production
+      - Development
+      - Stage
+      - Testbed
   VPC:
     Description: "Enter your VPC ID."
     Type: AWS::EC2::VPC::Id
@@ -27,6 +44,7 @@ Parameters:
       - t3.small
       - t3.medium
       - t3.large
+
 Mappings:
   AmiRegionMap:
     ap-northeast-2:
@@ -38,6 +56,7 @@ Mappings:
     us-east-1:
       amazon: ami-051f7e7f6c2f40dc1 # Amazon Linux 2023 AMI 2023.1.20230825.0 x86_64 HVM kernel-6.1
       ubuntu: ami-053b0d53c279acc90 # Ubuntu, 22.04 LTS, amd64 jammy image build on 2023-05-16
+
 Conditions:
   AmazonHost:
     Fn::Equals:
@@ -47,7 +66,9 @@ Conditions:
     Fn::Equals:
       - Ref: OsType
       - ubuntu
+
 Resources:
+
   IamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -56,7 +77,9 @@ Resources:
         Fn::Join:
           - ''
           - - Ref: AWS::StackName
-            - "-provisioner-role"
+            - '-'
+            - Ref: Name
+            - "-role"
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -76,14 +99,37 @@ Resources:
         - arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
-  IamPolicies:
+      Tags:
+        - Key: ManagedBy
+          Value: CF
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - "-"
+                - Ref: Name
+                - "-role"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
+        - Key: Owner
+          Value:
+            Ref: Owner
+
+  IamPolicy:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName:
         Fn::Join:
           - ''
           - - Ref: AWS::StackName
-            - "-provisioner-policy"
+            - '-'
+            - Ref: Name
+            - "-policy"
       PolicyDocument:
         Statement:
           - Effect: Deny
@@ -102,12 +148,14 @@ Resources:
             Resource: "*"
       Roles:
         - Ref: IamRole
+
   IamInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: "/"
       Roles:
         - Ref: IamRole
+
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -116,25 +164,35 @@ Resources:
         Fn::Join:
           - ''
           - - Ref: AWS::StackName
-            - "-provisioner-sg"
+            - "-"
+            - Ref: Name
+            - "-sg"
       VpcId:
         Ref: VPC
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
       Tags:
+        - Key: ManagedBy
+          Value: CF
         - Key: Name
           Value:
             Fn::Join:
               - ''
               - - Ref: AWS::StackName
-                - "-ec2-access"
+                - "-"
+                - Ref: Name
+                - "-sg"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
         - Key: Owner
           Value:
             Ref: Owner
-        - Key: Name
-          Value:
-            Ref: AWS::StackName
-      SecurityGroupEgress:
-        - IpProtocol: "-1"
-          CidrIp: 0.0.0.0/0
+
   EC2Instance:
     Type: AWS::EC2::Instance
     DependsOn:
@@ -165,14 +223,68 @@ Resources:
               - ubuntu
 
       UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash -xe
-          sudo yum install -y git jq
+        Fn::If:
+          - AmazonHost
+          - Fn::Base64: !Sub |
+              #!/bin/bash
+              id > /tmp/idcheck.out
+              sudo yum install -y git jq
+              # docker
+              sudo dnf update
+              sudo dnf install -y docker
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ec2-user
+              # kubectl
+              curl -o /tmp/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.4/2023-08-16/bin/linux/amd64/kubectl
+              chmod +x /tmp/kubectl
+              mv /tmp/kubectl /usr/local/bin/
+              # for ec2-user
+              sudo -u ec2-user bash <<'EOF'
+              sudo curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | sudo bash
+              tfswitch --latest-stable 1.4.5
+              ln -s ~/bin/terraform ~/bin/tf
+              EOF
+
+          - Fn::Base64: !Sub |
+              #!/bin/bash
+              id > /tmp/idcheck.out
+              apt-get update
+              apt-get install -y unzip git jq
+              # awscli
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+              ln -s /usr/local/bin/aws /usr/bin/aws
+              # docker
+              sudo snap install docker
+              sudo groupadd docker
+              sudo usermod -aG docker ubuntu
+              # for ubuntu
+              sudo -u ubuntu bash <<'EOF'
+              sudo curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | sudo bash
+              tfswitch --latest-stable 1.4.5
+              ln -s ~/bin/terraform ~/bin/tf
+              EOF
+              # curl ca-certificates git awscli
 
       Tags:
+        - Key: ManagedBy
+          Value: CF
         - Key: Name
           Value:
-            Ref: AWS::StackName
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - "-"
+                - Ref: Name
+                - "-ec2"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
         - Key: Owner
           Value:
             Ref: Owner
@@ -197,11 +309,11 @@ Resources:
 
 Outputs:
   Owner:
-    Description: Team or Individual that Owns this Formation.
+    Description: Owner of the CloudFormation Stack.
     Value:
       Ref: Owner
   EIP:
-    Description: Bastion External IP Address
+    Description: EC2 External IP Address
     Value:
       Ref: EIP
   OsType:
@@ -213,7 +325,7 @@ Outputs:
     Value:
       Ref: InstanceType
   EC2SecurityGroup:
-    Description: EC2 Security Group to Allow Remote Access
+    Description: EC2 Security Group for EC2 Instance
     Value:
       Ref: EC2SecurityGroup
   IAMRole:
@@ -228,6 +340,7 @@ Outputs:
     Description: Public Subnet the Bastion Host was Deployed on.
     Value:
       Ref: PublicSubnet
+
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -235,9 +348,12 @@ Metadata:
           default: Ownership
         Parameters:
           - Owner
+          - Team
       - Label:
           default: Instance Settings
         Parameters:
+          - Name
+          - Environment
           - OsType
           - InstanceType
       - Label:
@@ -246,11 +362,17 @@ Metadata:
           - VPC
           - PublicSubnet
     ParameterLabels:
+      Name:
+        default: "Enter the resource name of the CloudFormation stack"
       Owner:
         default: "Enter the owner email address that manages the CloudFormation stack"
+      Team:
+        default: "Enter team name that operating the CloudFormation stack"
+      Environment:
+        default: "Choose runtime Environment"
       PublicSubnet:
         default: "Enter the public subnet ID"
       OsType:
-        default: "Please enter your OS type"
+        default: "Choose enter your OS type"
       InstanceType:
-        default: "Enter the EC2 instance type."
+        default: "Choose the EC2 instance type."

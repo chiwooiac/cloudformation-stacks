@@ -139,6 +139,7 @@ Resources:
               - kms:*
               - ses:*
               - sqs:*
+            Resource: "*"
           - Effect: Deny
             Action:
               - cloudhsm:*

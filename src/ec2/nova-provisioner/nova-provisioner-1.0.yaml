@@ -308,14 +308,14 @@ Resources:
     Tags:
       - Key: ManagedBy
         Value: CF
-          - Key: Name
-            Value:
-              Fn::Join:
-                - ''
-                - - Ref: AWS::StackName
-                  - "-"
-                  - Ref: Name
-                  - "-eip"
+      - Key: Name
+        Value:
+          Fn::Join:
+            - ''
+            - - Ref: AWS::StackName
+              - "-"
+              - Ref: Name
+              - "-eip"
 
   EIPAssociation:
     Type: AWS::EC2::EIPAssociation

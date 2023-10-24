@@ -94,7 +94,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonRoute53FullAccess
         - arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
-        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccessV2
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AmazonRDSFullAccess
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess

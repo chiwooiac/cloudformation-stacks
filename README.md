@@ -177,13 +177,10 @@ ImageId: !FindInMap
 CloudFormation 의 [내장 함수](https://docs.aws.amazon.com/ko_kr/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html)를 사용하여 문자열, 컬렉션, 리소스의 속성, Loop 반복, Subset 등을 제어할 수 있습니다.
 
 
-
-
-
 ## Bastion EC2
-- [Bastion EC2](./src/ec2/bastion/bastion-1.0.yaml) 생성을 위한 CloudFormation 템플릿 입니다.
-- [nova-provisioner](./src/ec2/nova-provisioner/nova-provisioner-1.0.yaml) Cloud-Formation을 이용하여 AWS 리소스를 Terraform 으로 프로비저닝 할 수 있는 EC2 컴퓨팅을 생성합니다.
-- [github-actions-role](./src/ec2/github-actions-role/github-actions-cf-1.0.yaml) Cloud-Formation을 이용하여 Github Actions 가 빌드된 Artifact 를 AWS 클라우드에 배포하기위한 AssumedRole 을 생성합니다.
+- [Bastion EC2](./src/ec2/bastion/bastion-1.0.yaml) 관리 목적의 EC2 베스천을 생성하는 CloudFormation 템플릿 입니다.
+- [nova-provisioner](./src/ec2/nova-provisioner/nova-provisioner-1.0.yaml) AWS 리소스를 Terraform 으로 프로비저닝 할 수 있는 EC2 컴퓨팅을 생성하는 CloudFormation 템플릿 입니다.
+- [github-actions-role](./src/ec2/github-actions-role/github-actions-cf-1.0.yaml) Github Actions이 빌드된 Artifact를 AWS 클라우드에 배포하기위한 AssumedRole을 생성하는 CloudFormation 템플릿 입니다.
 
 
 

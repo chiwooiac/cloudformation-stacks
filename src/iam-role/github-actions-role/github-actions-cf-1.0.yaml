@@ -2,13 +2,13 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: IAM resource
 Parameters:
   Name:
-    Description: "Resource Name of CloudFormation Stack"
+    Description: 'Resource name of CloudFormation Stack'
     Type: String
-    Default: "simplydemo"
+    Default: 'simplydemo'
   Owner:
     Description: 'Enter the email of the Owner who will operate the CloudFormation stack.'
     Type: String
-    Default: "your@email.com"
+    Default: 'your@email.com'
   Team:
     Description: 'Team name that will operate the CloudFormation stack.'
     Type: String
@@ -35,15 +35,15 @@ Parameters:
   GitHubOrgName:
     Description: 'Github organization or account name under which Github Actions run.'
     Type: String
-    Default: "simplydemo"
+    Default: 'simplydemo'
   RepositoryName:
     Description: 'ECR repository name where you want to upload docker image.'
     Type: String
-    Default: "vertx-lotto-api"
+    Default: 'simplydemo'
   ArtifactS3Bucket:
     Description: 'Enter the S3 Bucket name where you want to upload artifact.'
     Type: String
-    Default: "simplydemo-artifact-s3"
+    Default: 'simplydemo-artifact-s3'
   RoleMaxSessionDuration:
     Description: 'The maximum session duration (in seconds) limits the role-duration-seconds value in aws-actions/configure-aws-credentials'
     Type: Number
@@ -71,7 +71,7 @@ Resources:
         Fn::Join:
           - ''
           - - Ref: Name
-            - "GithubActionsRole"
+            - 'GithubActionsRole'
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -89,7 +89,7 @@ Resources:
             Fn::Join:
               - ''
               - - Ref: Name
-                - "GithubActionECRAccessPolicy"
+                - 'GithubActionECRAccessPolicy'
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -115,7 +115,7 @@ Resources:
             Fn::Join:
               - ''
               - - Ref: Name
-                - "GithubActionDeployPolicy"
+                - 'GithubActionDeployPolicy'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -140,7 +140,7 @@ Resources:
             Fn::Join:
               - ''
               - - Ref: Name
-                - "GithubActionsRole"
+                - 'GithubActionsRole'
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -164,8 +164,8 @@ Metadata:
           - RoleMaxSessionDuration
     ParameterLabels:
       Name:
-        default: "Enter the resource name of the CloudFormation stack"
+        default: 'Enter the resource name of the CloudFormation stack'
       Owner:
-        default: "Enter the owner email address that manages the CloudFormation stack"
+        default: 'Enter the owner email address that manages the CloudFormation stack'
       Team:
-        default: "Enter team name that operating the CloudFormation stack"
+        default: 'Enter team name that operating the CloudFormation stack'

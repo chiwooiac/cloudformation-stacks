@@ -101,12 +101,13 @@ Resources:
                 Action:
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
-                  - ecr:InitiateLayerUpload
-                  - ecr:PutImage
-                  - ecr:UploadLayerPart
-                  - ecr:ListImages
-                  - ecr:CompleteLayerUpload
                   - ecr:BatchCheckLayerAvailability
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+                  - ecr:PutImage
+                  - ecr:ListImages
                 Resource:
                   - !Sub arn:aws:ecr:${AwsRegion}:${AWS::AccountId}:repository/${RepositoryName}
                   - !Sub arn:aws:ecr:${AwsRegion}:${AWS::AccountId}:repository/${RepositoryName}/*

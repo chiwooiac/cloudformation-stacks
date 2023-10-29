@@ -5,6 +5,11 @@
 
 <br>
 
+## Checkout
+```
+git clone https://github.com/chiwooiac/cloud-formation.git
+```
+
 ## CloudFormation 템플릿
 
 템플릿이란 스택을 구성하는 AWS 리소스를 선언한 것입니다. 템플릿은 YAML 표준을 준수하는 형식의 텍스트 파일로 정의합니다.
@@ -176,7 +181,9 @@ CloudFormation 의 [내장 함수](https://docs.aws.amazon.com/ko_kr/AWSCloudFor
 
 
 ## Bastion EC2
-[Bastion EC2](./src/ec2/bastion/bastion-1.0.yaml) 생성을 위한 CloudFormation 템플릿 입니다.
+- [Bastion EC2](./src/ec2/bastion/bastion-1.0.yaml) 생성을 위한 CloudFormation 템플릿 입니다.
+- [nova-provisioner](./src/ec2/nova-provisioner/nova-provisioner-1.0.yaml) Cloud-Formation을 이용하여 AWS 리소스를 Terraform 으로 프로비저닝 할 수 있는 EC2 컴퓨팅을 생성합니다.
+- [github-actions-role](./src/ec2/github-actions-role/github-actions-cf-1.0.yaml) Cloud-Formation을 이용하여 Github Actions 가 빌드된 Artifact 를 AWS 클라우드에 배포하기위한 AssumedRole 을 생성합니다.
 
 
 

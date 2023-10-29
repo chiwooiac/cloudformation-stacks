@@ -7,8 +7,7 @@ Cloud Formation을 Github Actions 워크플로우가 빌드한 애플리케이�
 ## CloudFormation 템플릿 다운로드
 
 ```
-curl -O https://raw.githubusercontent.com/chiwooiac/cloudformation-stacks/main/src/iam-role/github-actions-role/github-actions-cf-1.0.yaml \
-  /tmp/github-actions-cf-1.0.yaml
+curl -O https://raw.githubusercontent.com/chiwooiac/cloudformation-stacks/main/src/iam-role/github-actions-role/github-actions-cf-1.0.yaml
 ```
 
 <br>

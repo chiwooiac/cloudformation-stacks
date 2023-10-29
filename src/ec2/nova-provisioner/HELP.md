@@ -7,8 +7,7 @@ Cloud-Formation 을 이용하여 AWS Cloud 서비스를 프로비저닝할 수 �
 ## nova-provisioner-1.0.yaml 템플릿 다운로드
 
 ```
-curl -O https://raw.githubusercontent.com/chiwooiac/cloudformation-stacks/main/src/ec2/nova-provisioner/nova-provisioner-1.0.yaml \
-  /tmp/nova-provisioner-1.0.yaml
+curl -O https://raw.githubusercontent.com/chiwooiac/cloudformation-stacks/main/src/ec2/nova-provisioner/nova-provisioner-1.0.yaml
 ```
 
 <br>

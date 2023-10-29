@@ -24,7 +24,7 @@ aws cloudformation validate-template --template-body file://./github-actions-cf-
 
 ![img.png](..%2F..%2F..%2Fimg%2Fimg.png)
 
-- 다운로드 받은 `nova-provisioner-1.0.yaml` 파일을 `Upload a template file` 버튼을 통해 업로드 하고 Next 를 클릭 합니다.
+- 다운로드 받은 `github-actions-cf-1.0.yaml` 파일을 `Upload a template file` 버튼을 통해 업로드 하고 Next 를 클릭 합니다.
 
 ![img_1.png](..%2F..%2F..%2Fimg%2Fimg_1.png)
 
@@ -32,21 +32,26 @@ aws cloudformation validate-template --template-body file://./github-actions-cf-
 
 ![img_1.png](..%2F..%2F..%2Fimg%2Fimg_4.png)
 
-| Lable Group       | Name             | Example                    | Desc.                                                                                           |
-|-------------------|------------------|----------------------------|-------------------------------------------------------------------------------------------------|
-| StackName         | StackName        | simplydemo-github-actions  | CF 스택 이름입니다.                                                                                    |
-| ResourceGroupName | Name             | simpledemo                 | 리소스 그룸 이름입니다. 프로젝트 코드를 입력할 수 있습니다.                                                   |
-| OwnerShip         | Owner            | admin@myterra.io           | CF 스택을 운영 및 관리하는 책임자입니다.                                                                        |
-| -                 | Team             | DevOps                     | CF 스택을 운영 및 관리하는 조직입니다.                                                                         |
-| OIDC Settings     | GitHubOrg        | simplydemo                 | Github Actions 가 실행되는 Github 조직 또는 계정 이름입니다.                                                    |
-| -                 | AWSRegion        | ap-northeast-2             | Artifact를 배포 할 AWS 리전 코드를 선택합니다.                                                                |
-| -                 | RepositoryName   | vertx-lotto-api            | AWS ECR 저장소 이름 입니다.                                                                             |
-| -                 | ArtifactS3Bucket | simplydemo-artifact-s3     | 빌드한 Artifact를 업로드 할 AWS S3 버킷 이름입니다. Spark Job jar 또는 lambda 코드를 압축한 zip 파일 등을 S3 버킷으로 업로드 합니다. |
+<br>
+
+| Lable Group       | Name                   | Example                   | Desc.                                                                                           |
+|-------------------|------------------------|---------------------------|-------------------------------------------------------------------------------------------------|
+| StackName         | StackName              | simplydemo-github-actions | CF 스택 이름입니다.                                                                                    |
+| ResourceGroupName | Name                   | simpledemo                | 리소스 그룸 이름입니다. 프로젝트 코드를 입력할 수 있습니다.                                                              |
+| OwnerShip         | Owner                  | admin@myterra.io          | CF 스택을 운영 및 관리하는 책임자입니다.                                                                        |
+| -                 | Team                   | DevOps                    | CF 스택을 운영 및 관리하는 조직입니다.                                                                         |
+| OIDC Settings     | GitHubOrg              | simplydemo                | Github Actions 가 실행되는 Github 조직 또는 계정 이름입니다.                                                    |
+| -                 | AWSRegion              | ap-northeast-2            | Artifact를 배포 할 AWS 리전 코드를 선택합니다.                                                                |
+| -                 | RepositoryName         | vertx-lotto-api           | AWS ECR 저장소 이름 입니다.                                                                             |
+| -                 | ArtifactS3Bucket       | simplydemo-artifact-s3    | 빌드한 Artifact를 업로드 할 AWS S3 버킷 이름입니다. Spark Job jar 또는 lambda 코드를 압축한 zip 파일 등을 S3 버킷으로 업로드 합니다. |
+| -                 | RoleMaxSessionDuration | 21600                     | Github Actions 가 액세스하는 STS 임시 토큰의 유효 시간입니다. (단위: 초)                                            |
  
 <br>
 
 - 모든 설정 정보를 리뷰하고 `Submit` 버튼을 클릭하여 CF 스택을 생성 합니다. 
 
+
+<br>
 
 ## 자격 증명 공급자 및 페더레이션
 [자격 증명 공급자 및 페더레이션](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/id_roles_providers.html) AWS 외부에서 사용자 자격 증명을 이미 관리하고 있다면, IAM 페더레이션 자격 증명 공급자를 사용할 수 있습니다. 

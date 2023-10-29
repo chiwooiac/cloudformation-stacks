@@ -107,7 +107,9 @@ Resources:
                   - ecr:ListImages
                   - ecr:CompleteLayerUpload
                   - ecr:BatchCheckLayerAvailability
-                Resource: !Sub arn:aws:ecr:${AwsRegion}:${AWS::AccountId}:repository/${RepositoryName}
+                Resource:
+                  - !Sub arn:aws:ecr:${AwsRegion}:${AWS::AccountId}:repository/${RepositoryName}
+                  - !Sub arn:aws:ecr:${AwsRegion}:${AWS::AccountId}:repository/${RepositoryName}/*
 
         - PolicyName:
             Fn::Join:

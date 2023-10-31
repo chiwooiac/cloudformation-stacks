@@ -109,7 +109,7 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref CidrBlock
-      AvailabilityZone: !Select [0, !GetAZs '']
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
@@ -193,8 +193,6 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonRDSFullAccess
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
       Tags:
-        - Key: ManagedBy
-          Value: CF
         - Key: Name
           Value:
             Fn::Join:
@@ -203,6 +201,8 @@ Resources:
                 - "-"
                 - Ref: Name
                 - "-ec2-role"
+        - Key: ManagedBy
+          Value: CF
         - Key: Environment
           Value:
             Ref: Environment
@@ -255,7 +255,39 @@ Resources:
       Path: "/"
       Roles:
         - Ref: IamRole
+### service linked roles
+  ServiceLinkedRoleForElb:
+    Type: AWS::IAM::ServiceLinkedRole
+    UpdateReplacePolicy: Retain
+    Properties:
+      AWSServiceName: elasticloadbalancing.amazonaws.com
+      Description: Service Linked Role for ELB service which is used by provisioner.
+  ServiceLinkedRoleForEcs:
+    Type: AWS::IAM::ServiceLinkedRole
+    UpdateReplacePolicy: Retain
+    Properties:
+      AWSServiceName: ecs.amazonaws.com
+      Description: Service Linked Role for ECS service which is used by provisioner.
+  ServiceLinkedRoleForEks:
+    Type: AWS::IAM::ServiceLinkedRole
+    UpdateReplacePolicy: Retain
+    Properties:
+      AWSServiceName: eks.amazonaws.com
+      Description: Service Linked Role for EKS service which is used by provisioner.
+  ServiceLinkedRoleForEksNode:
+    Type: AWS::IAM::ServiceLinkedRole
+    UpdateReplacePolicy: Retain
+    Properties:
+      AWSServiceName: eks-nodegroup.amazonaws.com
+      Description: Service Linked Role for EKS Node Group service which is used by provisioner.
+  ServiceLinkedRoleForEksFargate:
+    Type: AWS::IAM::ServiceLinkedRole
+    UpdateReplacePolicy: Retain
+    Properties:
+      AWSServiceName: eks-fargate.amazonaws.com
+      Description: Service Linked Role for EKS Fargate service which is used by provisioner.
 
+### EC2
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -292,7 +324,7 @@ Resources:
         - Key: Owner
           Value:
             Ref: Owner
-  ### EC2
+
   EC2Instance:
     Type: AWS::EC2::Instance
     DependsOn:

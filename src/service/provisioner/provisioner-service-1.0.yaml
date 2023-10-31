@@ -37,7 +37,7 @@ Parameters:
       - t3.medium
       - t3.large
   OsType:
-    Description: "Enter the OS type."
+    Description: "Choose the OS type."
     Type: String
     Default: amazon
     AllowedValues:

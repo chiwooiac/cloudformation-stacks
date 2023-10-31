@@ -5,7 +5,9 @@ Parameters:
   Name:
     Description: 'Resource Name for CloudFormation Stack'
     Type: String
-    Default: provisioner
+    Default: geniaas
+    AllowedPattern: "[A-Za-z]*"
+    ConstraintDescription: "Must contain only letters and be 8 characters or fewer"
   Owner:
     Description: 'Enter the email of the Owner who will operate the CloudFormation stack.'
     Type: String
@@ -247,26 +249,6 @@ Resources:
             Resource: "*"
       Roles:
         - Ref: IamRole
-      Tags:
-        - Key: ManagedBy
-          Value: CF
-        - Key: Name
-          Value:
-            Fn::Join:
-              - ''
-              - - Ref: AWS::StackName
-                - "-"
-                - Ref: Name
-                - "-ec2-policy"
-        - Key: Environment
-          Value:
-            Ref: Environment
-        - Key: Team
-          Value:
-            Ref: Team
-        - Key: Owner
-          Value:
-            Ref: Owner
   IamInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:

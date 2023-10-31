@@ -474,6 +474,11 @@ Outputs:
     Description: OS Type.
     Value:
       Ref: OsType
+  InstanceId:
+    Description: Instance ID.
+    Value:
+      Ref: EC2Instance
+      # Ref: !GetAtt EC2Instance.VpcId
   InstanceType:
     Description: Instance Type.
     Value:
@@ -494,3 +499,10 @@ Outputs:
     Description: Public Subnet the Bastion Host was Deployed on.
     Value:
       Ref: PublicSubnet
+  SsmStartSessionCLI:
+    Description: SSM start session to EC2
+    Value:
+      Fn::Join:
+        - ''
+        - - 'aws ssm start-session --target '
+          - Ref: EC2Instance

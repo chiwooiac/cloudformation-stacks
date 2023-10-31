@@ -61,3 +61,16 @@ aws cloudformation validate-template --template-body file://./provisioner-servic
  
 ![img_8.png](..%2F..%2F..%2Fimg%2Fimg_8.png)
 
+## CloudFormation 스택 트러블 슈팅
+
+CloudFormation 템플릿을 실행 하던 중 얼마든지 프로비저닝 오류가 발생할 수있습니다.    
+
+![img_9.png](..%2F..%2F..%2Fimg%2Fimg_9.png)
+
+`Events` 탭에서 수행 이력을 살펴 보면 `ServiceLinkedRoleForAutoScaling` 리소스 생성 중 해당 리소스가 이미 존재하기에 발생된 오류 원인을 식별할 수 있습니다.
+
+![img_10.png](..%2F..%2F..%2Fimg%2Fimg_10.png)
+
+이 경우에는 `Stack aActions` 탭에서 `Import resources into stack` 버튼을 클릭하여 아래와 같이 템플릿에 정의한 이름 항목에 실제 리소스 이름 또는 ARN 을 기입하면 됩니다.
+
+![img_11.png](..%2F..%2F..%2Fimg%2Fimg_11.png)

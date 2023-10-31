@@ -262,6 +262,12 @@ Resources:
     Properties:
       AWSServiceName: elasticloadbalancing.amazonaws.com
       Description: Service Linked Role for ELB service which is used by provisioner.
+  ServiceLinkedRoleForAutoScaling:
+    Type: AWS::IAM::ServiceLinkedRole
+    UpdateReplacePolicy: Retain
+    Properties:
+      AWSServiceName: autoscaling.amazonaws.com
+      Description: Service Linked Role for EC2 Auto Scaling service which is used by provisioner.
   ServiceLinkedRoleForEcs:
     Type: AWS::IAM::ServiceLinkedRole
     UpdateReplacePolicy: Retain

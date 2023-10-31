@@ -67,6 +67,13 @@ Conditions:
     Fn::Equals:
       - Ref: OsType
       - ubuntu
+#  SkipAWSServiceRoleForElasticLoadBalancing: !Equals [ "true", "false" ]
+#  SkipAWSServiceRoleForAutoScaling: !Equals [ "true", "false" ]
+#  SkipAWSServiceRoleForECS: !Equals [ "true", "false" ]
+#  SkipAWSServiceRoleForAmazonEKS: !Equals [ "true", "false" ]
+#  SkipAWSServiceRoleForAmazonEKSNodegroup: !Equals [ "true", "false" ]
+#  SkipAWSServiceRoleForAmazonEKSForFargate: !Equals [ "true", "false" ]
+#  SkipAWSServiceRoleForRDS: !Equals [ "true", "false" ]
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -119,7 +126,7 @@ Resources:
               - - Ref: AWS::StackName
                 - '-'
                 - Ref: Name
-                - "-pub-sn"
+                - "-public-sn"
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
     Properties:
@@ -156,7 +163,7 @@ Resources:
               - - Ref: AWS::StackName
                 - '-'
                 - Ref: Name
-                - "-pub-rt"
+                - "-public-rt"
   SubnetRouteTableAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
@@ -255,43 +262,57 @@ Resources:
       Path: "/"
       Roles:
         - Ref: IamRole
+
 ### service linked roles
-  ServiceLinkedRoleForElb:
+  AWSServiceRoleForElasticLoadBalancing:
     Type: AWS::IAM::ServiceLinkedRole
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       AWSServiceName: elasticloadbalancing.amazonaws.com
       Description: Service Linked Role for ELB service which is used by provisioner.
-  ServiceLinkedRoleForAutoScaling:
+#    Condition: SkipAWSServiceRoleForElasticLoadBalancing
+  AWSServiceRoleForAutoScaling:
     Type: AWS::IAM::ServiceLinkedRole
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       AWSServiceName: autoscaling.amazonaws.com
       Description: Service Linked Role for EC2 Auto Scaling service which is used by provisioner.
-  ServiceLinkedRoleForEcs:
+#    Condition: SkipAWSServiceRoleForAutoScaling
+  AWSServiceRoleForECS:
     Type: AWS::IAM::ServiceLinkedRole
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       AWSServiceName: ecs.amazonaws.com
       Description: Service Linked Role for ECS service which is used by provisioner.
-  ServiceLinkedRoleForEks:
+#    Condition: SkipAWSServiceRoleForECS
+  AWSServiceRoleForAmazonEKS:
     Type: AWS::IAM::ServiceLinkedRole
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       AWSServiceName: eks.amazonaws.com
       Description: Service Linked Role for EKS service which is used by provisioner.
-  ServiceLinkedRoleForEksNode:
+#    Condition: SkipAWSServiceRoleForAmazonEKS
+  AWSServiceRoleForAmazonEKSNodegroup:
     Type: AWS::IAM::ServiceLinkedRole
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       AWSServiceName: eks-nodegroup.amazonaws.com
       Description: Service Linked Role for EKS Node Group service which is used by provisioner.
-  ServiceLinkedRoleForEksFargate:
+#    Condition: SkipAWSServiceRoleForAmazonEKSNodegroup
+  AWSServiceRoleForAmazonEKSForFargate:
     Type: AWS::IAM::ServiceLinkedRole
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       AWSServiceName: eks-fargate.amazonaws.com
       Description: Service Linked Role for EKS Fargate service which is used by provisioner.
+#    Condition: SkipAWSServiceRoleForAmazonEKSForFargate
+  AWSServiceRoleForRDS:
+    Type: AWS::IAM::ServiceLinkedRole
+    DeletionPolicy: Delete
+    Properties:
+      AWSServiceName: rds.amazonaws.com
+      Description: Service Linked Role for RDS which is used by provisioner.
+#    Condition: SkipAWSServiceRoleForRDS
 
 ### EC2
   EC2SecurityGroup:

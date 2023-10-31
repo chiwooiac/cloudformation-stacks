@@ -147,7 +147,8 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Resource Group Name like Project
+          default:
+            Resource Name
         Parameters:
           - Name
       - Label:

@@ -34,17 +34,17 @@ aws cloudformation validate-template --template-body file://./github-actions-cf-
 
 <br>
 
-| Lable Group       | Name                   | Example                   | Desc.                                                                                           |
-|-------------------|------------------------|---------------------------|-------------------------------------------------------------------------------------------------|
-| StackName         | StackName              | simplydemo-github-actions | CF 스택 이름입니다.                                                                                    |
-| ResourceGroupName | Name                   | simpledemo                | 리소스 그룸 이름입니다. 프로젝트 코드를 입력할 수 있습니다.                                                              |
-| OwnerShip         | Owner                  | admin@myterra.io          | CF 스택을 운영 및 관리하는 책임자입니다.                                                                        |
-| -                 | Team                   | DevOps                    | CF 스택을 운영 및 관리하는 조직입니다.                                                                         |
-| OIDC Settings     | GitHubOrg              | simplydemo                | Github Actions 가 실행되는 Github 조직 또는 계정 이름입니다.                                                    |
-| -                 | AWSRegion              | ap-northeast-2            | Artifact를 배포 할 AWS 리전 코드를 선택합니다.                                                                |
-| -                 | RepositoryName         | vertx-lotto-api           | AWS ECR 저장소 이름 입니다.                                                                             |
-| -                 | ArtifactS3Bucket       | simplydemo-artifact-s3    | 빌드한 Artifact를 업로드 할 AWS S3 버킷 이름입니다. Spark Job jar 또는 lambda 코드를 압축한 zip 파일 등을 S3 버킷으로 업로드 합니다. |
-| -                 | RoleMaxSessionDuration | 21600                     | Github Actions 가 액세스하는 STS 임시 토큰의 유효 시간입니다. (단위: 초)                                            |
+| Lable Group   | Name                   | Example                | Desc.                                                                             |
+|---------------|------------------------|------------------------|-----------------------------------------------------------------------------------|
+| StackName     | StackName              | simply-github-actions  | Resource Name for CloudFormation Stack                                            |
+| Resource Name | Name                   | simplydemo             | Enter the resource name of the CloudFormation stack                               |
+| OwnerShip     | Owner                  | admin@email.address    | Enter the email of the Owner who will operate the CloudFormation stack.           |
+| -             | Team                   | DevOps                 | Team name that will operate the CloudFormation stack.                             |
+| OIDC Settings | GitHubOrgName          | simplydemo             | Github organization or account name under which Github Actions run.               |
+| -             | AWSRegion              | ap-northeast-2         | Choose the AWS Region code where you want to deploy artifact.                     |
+| -             | RepositoryName         | vertx-lotto-api        | ECR repository name where you want to upload docker image.                        |
+| -             | ArtifactS3Bucket       | simplydemo-artifact-s3 | Enter the S3 Bucket name where you want to upload artifact.                       |
+| -             | RoleMaxSessionDuration | 21600                  | The maximum session duration (in seconds) limits the role-duration-seconds value  |
  
 <br>
 

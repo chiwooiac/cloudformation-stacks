@@ -1,0 +1,482 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: simply-provisioner by symplesims@gmail.com v20231031
+Parameters:
+  Name:
+    Description: 'Resource Name for CloudFormation Stack'
+    Type: String
+    Default: provisioner
+  Owner:
+    Description: 'Enter the email of the Owner who will operate the CloudFormation stack.'
+    Type: String
+    Default: owner@email.address
+  Team:
+    Description: "Team name that will operate the CloudFormation stack."
+    Type: String
+    Default: DevOps
+  Environment:
+    Description: "Runtime Environment Stack such as Production | Development | Testbed."
+    Type: String
+    Default: Development
+    AllowedValues:
+      - Production
+      - Development
+      - Stage
+      - Testbed
+  CidrBlock:
+    Description: "Input your VPC CIDR Block."
+    Type: String
+    Default: 10.33.100.0/24
+  InstanceType:
+    Description: "Enter the instance type. (eg: t3.micro, t3.small, t3.medium, t3.large)"
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+  OsType:
+    Description: "Enter the OS type."
+    Type: String
+    Default: amazon
+    AllowedValues:
+      - amazon
+      - ubuntu
+
+Mappings:
+  AmiRegionMap:
+    ap-northeast-2:
+      amazon: ami-04a7c24c015ef1e4c # Amazon Linux 2023 AMI 2023.1.20230825.0 x86_64 HVM kernel-6.1
+      ubuntu: ami-0c9c942bd7bf113a2 # Ubuntu, 22.04 LTS, amd64 jammy image build on 2023-05-16
+    us-west-2:
+      amazon: ami-002829755fa238bfa # Amazon Linux 2023 AMI 2023.1.20230825.0 x86_64 HVM kernel-6.1
+      ubuntu: ami-03f65b8614a860c29 # Ubuntu, 22.04 LTS, amd64 jammy image build on 2023-05-16
+    us-east-1:
+      amazon: ami-051f7e7f6c2f40dc1 # Amazon Linux 2023 AMI 2023.1.20230825.0 x86_64 HVM kernel-6.1
+      ubuntu: ami-053b0d53c279acc90 # Ubuntu, 22.04 LTS, amd64 jammy image build on 2023-05-16
+
+Conditions:
+  AmazonHost:
+    Fn::Equals:
+      - Ref: OsType
+      - amazon
+  UbuntuHost:
+    Fn::Equals:
+      - Ref: OsType
+      - ubuntu
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Ownership
+        Parameters:
+          - Owner
+          - Team
+      - Label:
+          default: Resource Configuration
+        Parameters:
+          - Name
+          - Environment
+          - CidrBlock
+      - Label:
+          default: Instance Settings
+        Parameters:
+          - OsType
+          - InstanceType
+
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: !Ref CidrBlock
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - '-'
+                - Ref: Name
+                - "-vpc"
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref CidrBlock
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - '-'
+                - Ref: Name
+                - "-pub-sn"
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - '-'
+                - Ref: Name
+                - "-igw"
+  VpcGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: VpcGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - '-'
+                - Ref: Name
+                - "-pub-rt"
+  SubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+  ### IamRole for EC2
+  IamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      RoleName:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::StackName
+            - '-'
+            - Ref: Name
+            - "-ec2-role"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonRoute53FullAccess
+        - arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccessV2
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Tags:
+        - Key: ManagedBy
+          Value: CF
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - "-"
+                - Ref: Name
+                - "-ec2-role"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
+        - Key: Owner
+          Value:
+            Ref: Owner
+
+  IamPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::StackName
+            - '-'
+            - Ref: Name
+            - "-ec2-policy"
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - ecs:*
+              - ecr:*
+              - kms:*
+              - ses:*
+              - sqs:*
+            Resource: "*"
+          - Effect: Deny
+            Action:
+              - cloudhsm:*
+              - aws-portal:*
+              - billing:*
+              - budgets:*
+              - ce:*
+              - consolidatedbilling:*
+              - cur:*
+              - invoicing:*
+              - payments:*
+              - purchase-orders:*
+              - tax:*
+            Resource: "*"
+      Roles:
+        - Ref: IamRole
+      Tags:
+        - Key: ManagedBy
+          Value: CF
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - "-"
+                - Ref: Name
+                - "-ec2-policy"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
+        - Key: Owner
+          Value:
+            Ref: Owner
+  IamInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - Ref: IamRole
+
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SSH Access to Instance
+      GroupName:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::StackName
+            - "-"
+            - Ref: Name
+            - "-ec2-sg"
+      VpcId:
+        Ref: Vpc
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: ManagedBy
+          Value: CF
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - "-"
+                - Ref: Name
+                - "-ec2-sg"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
+        - Key: Owner
+          Value:
+            Ref: Owner
+  ### EC2
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - EC2SecurityGroup
+      - IamInstanceProfile
+    Properties:
+      InstanceInitiatedShutdownBehavior: stop
+      Monitoring: 'true'
+      InstanceType:
+        Ref: InstanceType
+      SubnetId:
+        Ref: PublicSubnet
+      SecurityGroupIds:
+        - Ref: EC2SecurityGroup
+      IamInstanceProfile:
+        Ref: IamInstanceProfile
+      ImageId:
+        Fn::If:
+          - AmazonHost
+          - Fn::FindInMap:
+              - AmiRegionMap
+              - Ref: AWS::Region
+              - amazon
+          - Fn::FindInMap:
+              - AmiRegionMap
+              - Ref: AWS::Region
+              - ubuntu
+
+      UserData:
+        Fn::If:
+          - AmazonHost
+          - Fn::Base64: !Sub |
+              #!/bin/bash
+              id > /tmp/idcheck.out
+              sudo yum install -y git jq
+              # docker
+              sudo dnf update
+              sudo dnf install -y docker
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ec2-user
+              # kubectl
+              curl -o /tmp/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.4/2023-08-16/bin/linux/amd64/kubectl
+              chmod +x /tmp/kubectl
+              mv /tmp/kubectl /usr/local/bin/
+              # for ec2-user
+              sudo -u ec2-user bash <<'EOF'
+              sudo curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | sudo bash
+              tfswitch --latest-stable 1.4.5
+              ln -s ~/bin/terraform ~/bin/tf
+              EOF
+
+          - Fn::Base64: !Sub |
+              #!/bin/bash
+              id > /tmp/idcheck.out
+              apt-get update
+              apt-get install -y unzip git jq
+              # awscli
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+              ln -s /usr/local/bin/aws /usr/bin/aws
+              # kubectl
+              curl -o /tmp/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.4/2023-08-16/bin/linux/amd64/kubectl
+              chmod +x /tmp/kubectl
+              mv /tmp/kubectl /usr/local/bin/
+              # docker
+              sudo snap install docker
+              sudo groupadd docker
+              sudo usermod -aG docker ubuntu
+              # for ubuntu
+              sudo -u ubuntu bash <<'EOF'
+              sudo curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | sudo bash
+              tfswitch --latest-stable 1.4.5
+              ln -s ~/bin/terraform ~/bin/tf
+              EOF
+              # curl ca-certificates git awscli
+
+      Tags:
+        - Key: ManagedBy
+          Value: CF
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - "-"
+                - Ref: Name
+                - "-ec2"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
+        - Key: Owner
+          Value:
+            Ref: Owner
+
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: ManagedBy
+          Value: CF
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ''
+              - - Ref: AWS::StackName
+                - "-"
+                - Ref: Name
+                - "-eip"
+        - Key: Environment
+          Value:
+            Ref: Environment
+        - Key: Team
+          Value:
+            Ref: Team
+        - Key: Owner
+          Value:
+            Ref: Owner
+  EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    DependsOn:
+      - EC2Instance
+      - EIP
+    Properties:
+      InstanceId:
+        Ref: EC2Instance
+      AllocationId:
+        Fn::GetAtt:
+          - EIP
+          - AllocationId
+
+Outputs:
+  Owner:
+    Description: Owner of the CloudFormation Stack.
+    Value:
+      Ref: Owner
+  EIP:
+    Description: EC2 External IP Address
+    Value:
+      Ref: EIP
+  OsType:
+    Description: OS Type.
+    Value:
+      Ref: OsType
+  InstanceType:
+    Description: Instance Type.
+    Value:
+      Ref: InstanceType
+  EC2SecurityGroup:
+    Description: EC2 Security Group for EC2 Instance
+    Value:
+      Ref: EC2SecurityGroup
+  IAMRole:
+    Description: IAM Instance Profile Role Created.
+    Value:
+      Ref: IamRole
+  VPC:
+    Description: VPC Used
+    Value:
+      Ref: Vpc
+  PublicSubnet:
+    Description: Public Subnet the Bastion Host was Deployed on.
+    Value:
+      Ref: PublicSubnet

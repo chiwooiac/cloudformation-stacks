@@ -40,6 +40,10 @@ Parameters:
     Description: 'ECR repository name where you want to upload docker image.'
     Type: String
     Default: 'simplydemo'
+  EKSClusterName:
+    Description: 'EKS cluster name for accessing by api like kubectl'
+    Type: String
+    Default: 'nova-an2d-demo-eks'
   ArtifactS3Bucket:
     Description: 'Enter the S3 Bucket name where you want to upload artifact.'
     Type: String
@@ -89,15 +93,17 @@ Resources:
             Fn::Join:
               - ''
               - - Ref: Name
-                - 'GithubActionECRAccessPolicy'
+                - 'GithubActionAccessPolicy'
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Effect: Allow
+              - Sid: GetTokenForECR
+                Effect: Allow
                 Action:
                   - ecr:GetAuthorizationToken
                 Resource: '*'
-              - Effect: Allow
+              - Sid: AccessForECR
+                Effect: Allow
                 Action:
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
@@ -111,7 +117,12 @@ Resources:
                 Resource:
                   - !Sub arn:aws:ecr:${AwsRegion}:${AWS::AccountId}:repository/${RepositoryName}
                   - !Sub arn:aws:ecr:${AwsRegion}:${AWS::AccountId}:repository/${RepositoryName}/*
-
+              - Sid: AccessForEKS
+                Effect: Allow
+                Action:
+                  - eks:DescribeCluster
+                Resource:
+                  - !Sub arn:aws:eks:${AwsRegion}:${AWS::AccountId}:cluster/${EKSClusterName}
         - PolicyName:
             Fn::Join:
               - ''

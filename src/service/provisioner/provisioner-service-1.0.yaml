@@ -234,8 +234,9 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - ecs:*
               - ecr:*
+              - ecs:*
+              - eks:*
               - kms:*
               - ses:*
               - sqs:*
@@ -263,56 +264,56 @@ Resources:
       Roles:
         - Ref: IamRole
 
-### service linked roles
-  AWSServiceRoleForElasticLoadBalancing:
-    Type: AWS::IAM::ServiceLinkedRole
-    DeletionPolicy: Delete
-    Properties:
-      AWSServiceName: elasticloadbalancing.amazonaws.com
-      Description: Service Linked Role for ELB service which is used by provisioner.
-#    Condition: SkipAWSServiceRoleForElasticLoadBalancing
-  AWSServiceRoleForAutoScaling:
-    Type: AWS::IAM::ServiceLinkedRole
-    DeletionPolicy: Delete
-    Properties:
-      AWSServiceName: autoscaling.amazonaws.com
-      Description: Service Linked Role for EC2 Auto Scaling service which is used by provisioner.
-#    Condition: SkipAWSServiceRoleForAutoScaling
-  AWSServiceRoleForECS:
-    Type: AWS::IAM::ServiceLinkedRole
-    DeletionPolicy: Delete
-    Properties:
-      AWSServiceName: ecs.amazonaws.com
-      Description: Service Linked Role for ECS service which is used by provisioner.
-#    Condition: SkipAWSServiceRoleForECS
-  AWSServiceRoleForAmazonEKS:
-    Type: AWS::IAM::ServiceLinkedRole
-    DeletionPolicy: Delete
-    Properties:
-      AWSServiceName: eks.amazonaws.com
-      Description: Service Linked Role for EKS service which is used by provisioner.
-#    Condition: SkipAWSServiceRoleForAmazonEKS
-  AWSServiceRoleForAmazonEKSNodegroup:
-    Type: AWS::IAM::ServiceLinkedRole
-    DeletionPolicy: Delete
-    Properties:
-      AWSServiceName: eks-nodegroup.amazonaws.com
-      Description: Service Linked Role for EKS Node Group service which is used by provisioner.
-#    Condition: SkipAWSServiceRoleForAmazonEKSNodegroup
-  AWSServiceRoleForAmazonEKSForFargate:
-    Type: AWS::IAM::ServiceLinkedRole
-    DeletionPolicy: Delete
-    Properties:
-      AWSServiceName: eks-fargate.amazonaws.com
-      Description: Service Linked Role for EKS Fargate service which is used by provisioner.
-#    Condition: SkipAWSServiceRoleForAmazonEKSForFargate
-  AWSServiceRoleForRDS:
-    Type: AWS::IAM::ServiceLinkedRole
-    DeletionPolicy: Delete
-    Properties:
-      AWSServiceName: rds.amazonaws.com
-      Description: Service Linked Role for RDS which is used by provisioner.
-#    Condition: SkipAWSServiceRoleForRDS
+#### service linked roles
+#  AWSServiceRoleForElasticLoadBalancing:
+#    Type: AWS::IAM::ServiceLinkedRole
+#    DeletionPolicy: Delete
+#    Properties:
+#      AWSServiceName: elasticloadbalancing.amazonaws.com
+#      Description: Service Linked Role for ELB service which is used by provisioner.
+##    Condition: SkipAWSServiceRoleForElasticLoadBalancing
+#  AWSServiceRoleForAutoScaling:
+#    Type: AWS::IAM::ServiceLinkedRole
+#    DeletionPolicy: Delete
+#    Properties:
+#      AWSServiceName: autoscaling.amazonaws.com
+#      Description: Service Linked Role for EC2 Auto Scaling service which is used by provisioner.
+##    Condition: SkipAWSServiceRoleForAutoScaling
+#  AWSServiceRoleForECS:
+#    Type: AWS::IAM::ServiceLinkedRole
+#    DeletionPolicy: Delete
+#    Properties:
+#      AWSServiceName: ecs.amazonaws.com
+#      Description: Service Linked Role for ECS service which is used by provisioner.
+##    Condition: SkipAWSServiceRoleForECS
+#  AWSServiceRoleForAmazonEKS:
+#    Type: AWS::IAM::ServiceLinkedRole
+#    DeletionPolicy: Delete
+#    Properties:
+#      AWSServiceName: eks.amazonaws.com
+#      Description: Service Linked Role for EKS service which is used by provisioner.
+##    Condition: SkipAWSServiceRoleForAmazonEKS
+#  AWSServiceRoleForAmazonEKSNodegroup:
+#    Type: AWS::IAM::ServiceLinkedRole
+#    DeletionPolicy: Delete
+#    Properties:
+#      AWSServiceName: eks-nodegroup.amazonaws.com
+#      Description: Service Linked Role for EKS Node Group service which is used by provisioner.
+##    Condition: SkipAWSServiceRoleForAmazonEKSNodegroup
+#  AWSServiceRoleForAmazonEKSForFargate:
+#    Type: AWS::IAM::ServiceLinkedRole
+#    DeletionPolicy: Delete
+#    Properties:
+#      AWSServiceName: eks-fargate.amazonaws.com
+#      Description: Service Linked Role for EKS Fargate service which is used by provisioner.
+##    Condition: SkipAWSServiceRoleForAmazonEKSForFargate
+#  AWSServiceRoleForRDS:
+#    Type: AWS::IAM::ServiceLinkedRole
+#    DeletionPolicy: Delete
+#    Properties:
+#      AWSServiceName: rds.amazonaws.com
+#      Description: Service Linked Role for RDS which is used by provisioner.
+##    Condition: SkipAWSServiceRoleForRDS
 
 ### EC2
   EC2SecurityGroup:
